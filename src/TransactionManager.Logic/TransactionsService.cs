@@ -36,27 +36,13 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
         
         await connection.ExecuteAsync(sql, records);
     }
-
-    public async Task<List<Transaction>> Get(DateTime start, DateTime end, string ianaTimeZone)
+    
+    public async Task<XLWorkbook> ExportExcel(DateTime start, DateTime end, string ianaTimeZone, string[] fields)
     {
         var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(ianaTimeZone);
         var startUtc = TimeZoneInfo.ConvertTimeToUtc(start, timeZoneInfo);
         var endUtc = TimeZoneInfo.ConvertTimeToUtc(end, timeZoneInfo);
         
-        await using var connection = await dbConnectionFactory.CreateConnectionAsync();
-        const string sql =
-            """
-            SELECT "Id", "Name", "Email", "Amount", "Date" AT TIME ZONE "IanaTimeZone" AS "Date", "IanaTimeZone", "ClientLocation"
-            FROM "Transactions"
-            WHERE "Date" >= @StartUtc AND "Date" < @EndUtc
-            """;
-
-        var records = await connection.QueryAsync<Transaction>(sql, new {startUtc, endUtc});
-        return records.ToList();
-    }
-
-    public async Task<XLWorkbook> ExportExcel(DateTime start, DateTime end, string ianaTimeZone, string[] fields)
-    {
         var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Transactions");
 
@@ -76,22 +62,37 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
 
         async Task PopulateTransactionRows()
         {
-            var transactions = await Get(start, end, ianaTimeZone);
+            var transactions = await FetchTransactions(startUtc, endUtc);
             
             for (var i = 0; i < transactions.Count; i++)
             {
                 for (var j = 0; j < fields.Length; j++)
                 {
-                    const int firstRowAndZeroIndexOffset = 2;
-                    SetCellValueFromField(worksheet.Cell(i + firstRowAndZeroIndexOffset, j + 1), transactions[i], fields[j]); 
+                    const int zeroIndexOffset = 1;
+                    const int firstRowAndZeroIndexOffset = 1 + zeroIndexOffset;
+                    SetCellValueFromField(worksheet.Cell(i + firstRowAndZeroIndexOffset, j + zeroIndexOffset), transactions[i], fields[j]); 
                 }
             }
         }
     }
     
-    private static void SetCellValueFromField(IXLCell cell, Transaction transaction, string property)
+    private async Task<List<Transaction>> FetchTransactions(DateTime startUtc, DateTime endUtc)
     {
-        var value = GetCellValueFromField(transaction, property);
+        await using var connection = await dbConnectionFactory.CreateConnectionAsync();
+        const string sql =
+            """
+            SELECT "Id", "Name", "Email", "Amount", "Date" AT TIME ZONE "IanaTimeZone" AS "Date", "IanaTimeZone", "ClientLocation"
+            FROM "Transactions"
+            WHERE "Date" >= @StartUtc AND "Date" < @EndUtc
+            """;
+
+        var records = await connection.QueryAsync<Transaction>(sql, new {startUtc, endUtc});
+        return records.ToList();
+    }
+    
+    private static void SetCellValueFromField(IXLCell cell, Transaction transaction, string field)
+    {
+        var value = GetCellValueFromField(transaction, field);
         if (value.IsDateTime)
         {
             cell.Style.DateFormat.Format = "yyyy-MM-dd HH:mm:ss";
@@ -99,9 +100,9 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
         cell.SetValue(value);
     }
 
-    private static XLCellValue GetCellValueFromField(Transaction transaction, string property)
+    private static XLCellValue GetCellValueFromField(Transaction transaction, string field)
     {
-        return property switch
+        return field switch
         {
             "transaction_id" => transaction.Id,
             "name" => transaction.Name,
@@ -109,11 +110,11 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
             "amount" => transaction.Amount,
             "transaction_date" => transaction.Date.DateTime,
             "client_location" => transaction.ClientLocation.ToString(),
-            _ => throw TransactionManagerException.WrongTransactionField(property)
+            _ => throw TransactionManagerException.WrongTransactionField(field)
         };
     }
 
-    private static IEnumerable<Transaction> ExtractFromCsv(IFormFile csvFile)
+    private static List<Transaction> ExtractFromCsv(IFormFile csvFile)
     {
         using var reader = new StreamReader(csvFile.OpenReadStream());
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);

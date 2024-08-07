@@ -1,6 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManager", "TransactionManager\TransactionManager.csproj", "{50C9F0F3-734D-400E-A3CF-98326099471B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2305BC4-0682-41E4-9097-2F252BE7C187}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManager.API", "src\TransactionManager.API\TransactionManager.API.csproj", "{86E6BBF1-91F1-4B75-849F-95F2ADEBF537}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManager.Data", "src\TransactionManager.Data\TransactionManager.Data.csproj", "{49115C45-3BE7-470A-A75C-01CD3CD9DD5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManager.Logic", "src\TransactionManager.Logic\TransactionManager.Logic.csproj", "{671E3622-3CEA-406E-AF15-518490E228A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManager.IntegrationTests", "tests\TransactionManager.IntegrationTests\TransactionManager.IntegrationTests.csproj", "{F8717AC9-8D86-45D4-AB5E-03CFABA278B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +19,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{50C9F0F3-734D-400E-A3CF-98326099471B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50C9F0F3-734D-400E-A3CF-98326099471B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50C9F0F3-734D-400E-A3CF-98326099471B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50C9F0F3-734D-400E-A3CF-98326099471B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86E6BBF1-91F1-4B75-849F-95F2ADEBF537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86E6BBF1-91F1-4B75-849F-95F2ADEBF537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86E6BBF1-91F1-4B75-849F-95F2ADEBF537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86E6BBF1-91F1-4B75-849F-95F2ADEBF537}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49115C45-3BE7-470A-A75C-01CD3CD9DD5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49115C45-3BE7-470A-A75C-01CD3CD9DD5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49115C45-3BE7-470A-A75C-01CD3CD9DD5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49115C45-3BE7-470A-A75C-01CD3CD9DD5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{671E3622-3CEA-406E-AF15-518490E228A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{671E3622-3CEA-406E-AF15-518490E228A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{671E3622-3CEA-406E-AF15-518490E228A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{671E3622-3CEA-406E-AF15-518490E228A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8717AC9-8D86-45D4-AB5E-03CFABA278B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8717AC9-8D86-45D4-AB5E-03CFABA278B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8717AC9-8D86-45D4-AB5E-03CFABA278B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8717AC9-8D86-45D4-AB5E-03CFABA278B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

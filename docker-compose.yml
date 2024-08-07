@@ -1,6 +1,33 @@
-﻿services:
+﻿networks:
+  dev:
+    driver: bridge
+
+services:
   transactionmanager:
     image: transactionmanager
     build:
       context: .
-      dockerfile: TransactionManager/Dockerfile
+      dockerfile: src/TransactionManager.API/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - PostgresConnectionString=Server=db;Port=5432;Database=transactionmanager;User Id=postgres;Password=password;Include Error Detail=True;
+      - ASPNETCORE_HTTP_PORTS=80
+    depends_on:
+      - db
+    networks:
+      - dev
+  db:
+    image: postgres:14-bullseye
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=transactionmanager
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - dev

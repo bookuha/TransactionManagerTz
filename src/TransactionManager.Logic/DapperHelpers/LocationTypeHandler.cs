@@ -9,16 +9,16 @@ public class LocationTypeHandler : SqlMapper.TypeHandler<Location>
 {
     public override void SetValue(IDbDataParameter parameter, Location? value)
     {
-        parameter.Value = value.ToString();
+        parameter.Value = value is null ? DBNull.Value : value.ToString();
     }
 
     public override Location? Parse(object value)
     {
-        if (value is string s)
-        {
-            return new LocationConverter().ConvertFromString(s, null, null) as Location;
-        }
+        if (value is null or DBNull) return default;
 
-        return null;
+        if (value is not string s) return default;
+        
+        return new LocationConverter().ConvertFromString(s, null, null) as Location;
+       
     }
 }
