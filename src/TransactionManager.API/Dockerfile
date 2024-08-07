@@ -7,8 +7,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/TransactionManager.API/TransactionManager.API.csproj", "src/TransactionManager.API/"]
 COPY ["src/TransactionManager.Data/TransactionManager.Data.csproj", "src/TransactionManager.Data/"]
-COPY ["src/TransactionManager.Logic/TransactionManager.Data.csproj", "src/TransactionManager.Logic/"]
-COPY ["tests/TransactionManager.IntegrationsTests/TransactionManager.Data.csproj", "tests/TransactionManager.IntegrationsTests/"]
+COPY ["src/TransactionManager.Logic/TransactionManager.Logic.csproj", "src/TransactionManager.Logic/"]
+COPY ["tests/TransactionManager.IntegrationTests/TransactionManager.IntegrationTests.csproj", "tests/TransactionManager.IntegrationTests/"]
 RUN dotnet restore "src/TransactionManager.API/TransactionManager.API.csproj"
 COPY . .
 WORKDIR "/src/src/TransactionManager.API"
