@@ -1,0 +1,6 @@
+﻿services:
+  transactionmanager:
+    image: transactionmanager
+    build:
+      context: .
+      dockerfile: TransactionManager/Dockerfile
