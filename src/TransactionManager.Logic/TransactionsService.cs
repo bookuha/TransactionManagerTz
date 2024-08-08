@@ -39,10 +39,16 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
     
     public async Task<XLWorkbook> ExportExcel(DateTime start, DateTime end, string ianaTimeZone, string[] fields)
     {
-        var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(ianaTimeZone);
+        TimeZoneInfo.TryFindSystemTimeZoneById(ianaTimeZone, out var timeZoneInfo);
+        if (timeZoneInfo is null)
+        {
+            throw TransactionManagerException.InvalidTimeZone(ianaTimeZone);
+        }
+        
         var startUtc = TimeZoneInfo.ConvertTimeToUtc(start, timeZoneInfo);
         var endUtc = TimeZoneInfo.ConvertTimeToUtc(end, timeZoneInfo);
-        
+      
+
         var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Transactions");
 
