@@ -17,8 +17,7 @@ public class LocationTypeHandler : SqlMapper.TypeHandler<Location>
         if (value is null or DBNull) return default;
 
         if (value is not string s) return default;
-        
+
         return new LocationConverter().ConvertFromString(s, null, null) as Location;
-       
     }
 }

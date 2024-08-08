@@ -25,11 +25,11 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     public IDbConnectionFactory DbConnectionFactory = default!;
     private DbConnection _dbConnection = default!;
     private Respawner _respawner = default!;
-    
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         Environment.SetEnvironmentVariable("PostgresConnectionString", _dbContainer.GetConnectionString());
-        
+
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<TransactionManagerDbContext>();
@@ -70,7 +70,4 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     {
         await _dbContainer.StopAsync();
     }
-    
-   
-    
 }

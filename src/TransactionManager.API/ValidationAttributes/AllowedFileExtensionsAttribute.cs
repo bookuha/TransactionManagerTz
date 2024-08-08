@@ -10,14 +10,14 @@ public class AllowedFileExtensionsAttribute(string[] extensions) : ValidationAtt
         if (value is IFormFile file)
         {
             var extension = Path.GetExtension(file.FileName);
-            if (!extensions.Contains(extension.ToLower()))
-            {
-                return new ValidationResult(GetErrorMessage());
-            }
+            if (!extensions.Contains(extension.ToLower())) return new ValidationResult(GetErrorMessage());
         }
-        
+
         return ValidationResult.Success;
     }
 
-    private static string GetErrorMessage() => "Only csv files are allowed.";
+    private static string GetErrorMessage()
+    {
+        return "Only csv files are allowed.";
+    }
 }

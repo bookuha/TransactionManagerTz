@@ -28,9 +28,9 @@ builder.Services.AddSwaggerGen(options =>
         {
             Name = "Author's Telegram (click to open)",
             Url = new Uri("https://t.me/sharpenjoyer")
-        },
+        }
     });
-    
+
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
@@ -51,4 +51,6 @@ app.MapControllers();
 app.Run();
 
 // Make the implicit Program class public so test projects can access it
-public partial class Program { }
+public partial class Program
+{
+}

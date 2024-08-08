@@ -10,7 +10,6 @@ namespace TransactionManager.API.Controllers;
 [Route("api/transactions")]
 public class TransactionController(ITransactionsService transactionsService) : ControllerBase
 {
-
     /// <summary>
     /// Inserts transactions from a CSV (.csv) file.
     /// </summary>
@@ -32,7 +31,7 @@ public class TransactionController(ITransactionsService transactionsService) : C
         await transactionsService.UploadTransactions(file);
         return Ok();
     }
-    
+
     /// <summary>
     /// Fetches and exports the transactions as an Excel (.xlsx) file.
     /// </summary>
@@ -57,13 +56,11 @@ public class TransactionController(ITransactionsService transactionsService) : C
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> ExportExcel([FromQuery] ExportExcelRequest request)
     {
-        using var result = await transactionsService.ExportExcel(request.StartDate, request.EndDate, request.IanaTimeZone, request.Fields.ToArray());
+        using var result = await transactionsService.ExportExcel(request.StartDate, request.EndDate,
+            request.IanaTimeZone, request.Fields.ToArray());
         var stream = new MemoryStream(); // Note: File() will close the stream.
         result.SaveAs(stream);
         stream.Seek(0, SeekOrigin.Begin);
         return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "report.xlsx");
     }
-    
 }
-
-

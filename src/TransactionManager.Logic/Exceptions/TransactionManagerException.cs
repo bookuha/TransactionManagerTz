@@ -9,13 +9,13 @@ public class TransactionManagerException(string entityName, Errors error, string
 
     public static TransactionManagerException WrongTransactionField(string field)
     {
-        return new TransactionManagerException("Transaction",  Errors.WrongFlow, "Wrong Field",
+        return new TransactionManagerException("Transaction", Errors.WrongFlow, "Wrong Field",
             $"You cannot use the '{field}' for extraction.");
     }
-    
+
     public static TransactionManagerException InvalidTimeZone(string timezone)
     {
-        return new TransactionManagerException("Transaction",  Errors.WrongFlow, "Invalid Timezone",
+        return new TransactionManagerException("Transaction", Errors.WrongFlow, "Invalid Timezone",
             $"The timezone '{timezone}' is invalid.");
     }
 }

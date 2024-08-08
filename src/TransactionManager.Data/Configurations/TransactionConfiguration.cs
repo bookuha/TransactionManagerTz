@@ -21,5 +21,4 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         return new Location(Convert.ToDouble(locationStringEntries[0]), Convert.ToDouble(locationStringEntries[1]));
     }
-
 }

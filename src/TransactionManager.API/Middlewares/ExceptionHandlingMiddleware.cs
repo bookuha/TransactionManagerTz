@@ -38,7 +38,7 @@ public static class HttpExceptionHandlingUtilities
                     Status = (int) ResolveHttpStatusCode(tmException),
                     Type = $"{tmException.EntityName}.{tmException.Error}",
                     Title = tmException.Title,
-                    Detail = exception.Message,
+                    Detail = exception.Message
                 };
 
                 var json = JsonSerializer.Serialize(problemDetails);
@@ -63,14 +63,13 @@ public static class HttpExceptionHandlingUtilities
             }
         }
     }
-    
+
     private static HttpStatusCode ResolveHttpStatusCode(TransactionManagerException exception)
     {
         return exception.Error switch
         {
             Errors.WrongFlow => HttpStatusCode.BadRequest,
-            _ => HttpStatusCode.NotImplemented,
-
+            _ => HttpStatusCode.NotImplemented
         };
     }
 }
