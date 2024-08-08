@@ -79,7 +79,7 @@ public class TransactionManagerTests : IClassFixture<IntegrationTestWebAppFactor
 
         Assert.Equal(1, recordsCount);
     }
-
+    
     [Fact]
     public async Task Doesnt_Insert_Duplicates()
     {
@@ -108,7 +108,7 @@ public class TransactionManagerTests : IClassFixture<IntegrationTestWebAppFactor
     }
 
     [Fact]
-    public async Task Updates_Existing_Tasks()
+    public async Task Updates_Existing_Transactions()
     {
         // Note: There is no specific logic about which record should be left (i.e. based on timestamp), so the inserted one in taken.
 
@@ -141,7 +141,7 @@ public class TransactionManagerTests : IClassFixture<IntegrationTestWebAppFactor
     }
 
     [Fact]
-    public async Task Exports_Excel_Succesfully()
+    public async Task Exports_Excel_Successfully()
     {
         // Arrange
         string[] transactionStrings =

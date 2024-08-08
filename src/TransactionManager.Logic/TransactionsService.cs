@@ -1,6 +1,7 @@
 using System.Globalization;
 using ClosedXML.Excel;
 using CsvHelper;
+using CsvHelper.TypeConversion;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using TransactionManager.Data.Database;
@@ -14,7 +15,15 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
 {
     public async Task UploadTransactions(IFormFile csvFile)
     {
-        var records = ExtractFromCsv(csvFile);
+        List<Transaction> records;
+        try
+        {
+            records = ExtractFromCsv(csvFile);
+        }
+        catch (TypeConverterException ex)
+        {
+            throw TransactionManagerException.CsvParsingError(ex);
+        }
 
         await using var connection = await dbConnectionFactory.CreateConnectionAsync();
         const string sql =
@@ -112,9 +121,22 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
 
     private static List<Transaction> ExtractFromCsv(IFormFile csvFile)
     {
+        if (csvFile.Length == 0)
+            throw new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error",
+                "The transactions CSV file is empty.");
+        
         using var reader = new StreamReader(csvFile.OpenReadStream());
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
         csv.Context.RegisterClassMap<TransactionCsvMap>();
+        
+        string[] requiredHeaders = ["transaction_id", "name", "email", "amount", "transaction_date", "client_location" ];
+        csv.Read();
+        csv.ReadHeader();
+        var areRequiredHeadersPresent = csv.HeaderRecord!.SequenceEqual(requiredHeaders);
+        if (!areRequiredHeadersPresent)
+            throw new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error",
+                "The transactions CSV file must contain the following headers: " + string.Join(", ", requiredHeaders));
+        
         var records = csv.GetRecordsAsync<Transaction>().ToBlockingEnumerable().ToList();
         return records;
     }

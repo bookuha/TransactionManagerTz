@@ -1,11 +1,27 @@
+using CsvHelper.TypeConversion;
+
 namespace TransactionManager.Logic.Exceptions;
 
-public class TransactionManagerException(string entityName, Errors error, string title, string message)
-    : Exception(message)
+public class TransactionManagerException: Exception
 {
-    public string EntityName { get; } = entityName;
-    public Errors Error { get; } = error;
-    public string Title { get; } = title;
+    public TransactionManagerException(string entityName, Errors error, string title, string message)
+        : base(message)
+    {
+        EntityName = entityName;
+        Error = error;
+        Title = title;
+    }
+    protected TransactionManagerException(string entityName, Errors error, string title, string message, Exception innerException)
+        : base(message, innerException)
+    {
+        EntityName = entityName;
+        Error = error;
+        Title = title;
+    }
+    
+    public string EntityName { get; }
+    public Errors Error { get; }
+    public string Title { get; }
 
     public static TransactionManagerException WrongTransactionField(string field)
     {
@@ -17,6 +33,18 @@ public class TransactionManagerException(string entityName, Errors error, string
     {
         return new TransactionManagerException("Transaction", Errors.WrongFlow, "Invalid Timezone",
             $"The timezone '{timezone}' is invalid.");
+    }
+    
+    public static TransactionManagerException CsvParsingError(TypeConverterException ex)
+    {
+        var message = "An error occurred while parsing the CSV file.";
+        if (ex.Context is not null && ex.Context.Parser is not null && ex.Context.Reader is not null)
+        {
+            message += $" Specifically, at row {ex.Context.Parser.Row} and column {ex.Context.Reader.CurrentIndex + 1}." +
+                       $"Text {ex.Text}.";
+        }
+        return new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error",
+            message, ex);
     }
 }
 

@@ -21,6 +21,8 @@ public class TransactionController(ITransactionsService transactionsService) : C
     /// <param name="file"></param>
     /// <response code="200">Successfully inserts the transactions and returns the 0k status code.</response>
     /// <response code="400">If the file is not in .csv extension.</response>
+    /// <response code="400">If the file is empty.</response>
+    /// <response code="400">If the file is missing required headers.</response>
     /// /// <response code="500">If a critical error occurs.</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
