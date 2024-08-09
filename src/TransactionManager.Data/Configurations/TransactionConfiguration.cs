@@ -11,14 +11,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.ClientLocation)
             .HasConversion(
                 location => location.ToString(),
-                locationString => ConvertFromString(locationString)
+                locationString => Location.FromString(locationString)
             );
-    }
-
-    private static Location ConvertFromString(string postgresString)
-    {
-        var locationStringEntries = postgresString.Split([", ", " "], StringSplitOptions.RemoveEmptyEntries);
-
-        return new Location(Convert.ToDouble(locationStringEntries[0]), Convert.ToDouble(locationStringEntries[1]));
     }
 }
