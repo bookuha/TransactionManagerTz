@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using TransactionManager.Logic;
 
 namespace TransactionManager.API.ValidationAttributes;
 
 public class OnlyAllowedTransactionFieldsAttribute : ValidationAttribute
 {
-    private static readonly string[] AllowedFields =
-        ["transaction_id", "name", "email", "amount", "transaction_date", "client_location"];
+    private static readonly string[] AllowedFields = TransactionsService.HeaderFields;
 
     protected override ValidationResult IsValid(
         object value, ValidationContext validationContext)

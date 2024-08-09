@@ -1,7 +1,9 @@
 using System.Net;
 using System.Security.Authentication;
 using System.Text.Json;
+using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
+using TransactionManager.Logic;
 using TransactionManager.Logic.Exceptions;
 
 namespace TransactionManager.API.Middlewares;
@@ -39,6 +41,25 @@ public static class HttpExceptionHandlingUtilities
                     Type = $"{tmException.EntityName}.{tmException.Error}",
                     Title = tmException.Title,
                     Detail = exception.Message
+                };
+
+                var json = JsonSerializer.Serialize(problemDetails);
+                await context.Response.WriteAsync(json);
+                break;
+            }
+            case CsvHelperException:
+            {
+                context.Response.StatusCode = 400;
+                var problemDetails = new ProblemDetails
+                {
+                    Status = 400,
+                    Type = $"Transaction.Parsing",
+                    Title = "Parsing error occurred.",
+                    Detail =
+                        $"An unspecified problem has occurred while parsing the provided CSV file." +
+                        $" Make sure the file contains exactly 6 columns: {string.Join(',', TransactionsService.HeaderFields)}" +
+                        $" and that the data is in the correct format. Values that contain the delimiter character must" +
+                        $" enclosed in double quotes."
                 };
 
                 var json = JsonSerializer.Serialize(problemDetails);

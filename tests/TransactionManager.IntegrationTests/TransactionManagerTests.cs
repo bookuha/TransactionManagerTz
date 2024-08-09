@@ -5,6 +5,7 @@ using TransactionManager.Data.Database;
 using TransactionManager.Data.Model;
 using TransactionManager.IntegrationTests.Core;
 using TransactionManager.Logic;
+using TransactionManager.Logic.Exceptions;
 
 namespace TransactionManager.IntegrationTests;
 
@@ -14,8 +15,7 @@ public class TransactionManagerTests : IClassFixture<IntegrationTestWebAppFactor
     private readonly Func<Task> _resetDatabase;
     private readonly IDbConnectionFactory _dbConnectionFactory;
 
-    private static readonly string[] AllFields =
-        ["transaction_id", "name", "email", "amount", "transaction_date", "client_location"];
+    private static readonly string[] AllFields = TransactionsService.HeaderFields;
 
     public TransactionManagerTests(IntegrationTestWebAppFactory apiFactory)
     {
@@ -139,7 +139,26 @@ public class TransactionManagerTests : IClassFixture<IntegrationTestWebAppFactor
         Assert.Single(records);
         Assert.Equal(newUpsertedName, records.First().Name);
     }
+    
+    [Fact]
+    public async Task Fails_On_Incomplete_Header()
+    {
+        // Arrange
+        string[] transactionStrings =
+        [
+            "T-1-67.63636363636364_0.76,Adria Pugh,odio.a.purus@protonmail.edu,$375.39,2024-01-10 01:16:23,\"6.602635264, -98.2909591552\"",
+        ];
 
+        string[] incompleteHeader = ["transaction_id"]; // Note: Only 1 out of 6 required headers is present.
+        var file = CreateTransactionsCsvFile(incompleteHeader, transactionStrings);
+
+        // Act
+        async Task Act() => await _transactionsService.UploadTransactions(file);
+        // Assert
+        var caughtException = await Assert.ThrowsAsync<TransactionManagerException>(Act);
+        Assert.Equal("CSV Parsing Error (Headers)", caughtException.Title);
+    }
+    
     [Fact]
     public async Task Exports_Excel_Successfully()
     {
@@ -223,15 +242,22 @@ public class TransactionManagerTests : IClassFixture<IntegrationTestWebAppFactor
         return _resetDatabase();
     }
 
-    private static IFormFile CreateTransactionsCsvFile(IEnumerable<string> lines)
+    private static IFormFile CreateTransactionsCsvFile(string[] headerRowFields, IEnumerable<string> lines)
     {
         var stream = new MemoryStream();
         var writer = new StreamWriter(stream);
-        writer.WriteLine("transaction_id,name,email,amount,transaction_date,client_location");
+        writer.WriteLine(string.Join(',', headerRowFields));
         foreach (var line in lines) writer.WriteLine(line);
         writer.Flush();
         stream.Position = 0;
 
         return new FormFile(stream, 0, stream.Length, "some", "test.csv");
+    }
+    
+    private static IFormFile CreateTransactionsCsvFile(IEnumerable<string> lines)
+    {
+        return CreateTransactionsCsvFile(
+            AllFields,
+            lines);
     }
 }

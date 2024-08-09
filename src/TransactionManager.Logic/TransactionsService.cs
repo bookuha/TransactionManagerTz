@@ -13,6 +13,9 @@ namespace TransactionManager.Logic;
 
 public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITransactionsService
 {
+    public static readonly string[] HeaderFields =
+        ["transaction_id", "name", "email", "amount", "transaction_date", "client_location"];
+    
     public async Task UploadTransactions(IFormFile csvFile)
     {
         List<Transaction> records;
@@ -22,7 +25,7 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
         }
         catch (TypeConverterException ex)
         {
-            throw TransactionManagerException.CsvParsingError(ex);
+            throw TransactionManagerException.CsvFieldParsingError(ex);
         }
 
         await using var connection = await dbConnectionFactory.CreateConnectionAsync();
@@ -122,20 +125,19 @@ public class TransactionsService(IDbConnectionFactory dbConnectionFactory) : ITr
     private static List<Transaction> ExtractFromCsv(IFormFile csvFile)
     {
         if (csvFile.Length == 0)
-            throw new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error",
+            throw new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error (File is empty)",
                 "The transactions CSV file is empty.");
         
         using var reader = new StreamReader(csvFile.OpenReadStream());
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
         csv.Context.RegisterClassMap<TransactionCsvMap>();
         
-        string[] requiredHeaders = ["transaction_id", "name", "email", "amount", "transaction_date", "client_location" ];
         csv.Read();
         csv.ReadHeader();
-        var areRequiredHeadersPresent = csv.HeaderRecord!.SequenceEqual(requiredHeaders);
+        var areRequiredHeadersPresent = csv.HeaderRecord!.SequenceEqual(HeaderFields);
         if (!areRequiredHeadersPresent)
-            throw new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error",
-                "The transactions CSV file must contain the following headers: " + string.Join(", ", requiredHeaders));
+            throw new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error (Headers)",
+                "The transactions CSV file must contain the following headers: " + string.Join(", ", HeaderFields));
         
         var records = csv.GetRecordsAsync<Transaction>().ToBlockingEnumerable().ToList();
         return records;

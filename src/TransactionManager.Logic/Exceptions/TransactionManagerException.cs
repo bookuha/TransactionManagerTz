@@ -35,7 +35,7 @@ public class TransactionManagerException: Exception
             $"The timezone '{timezone}' is invalid.");
     }
     
-    public static TransactionManagerException CsvParsingError(TypeConverterException ex)
+    public static TransactionManagerException CsvFieldParsingError(TypeConverterException ex)
     {
         var message = "An error occurred while parsing the CSV file.";
         if (ex.Context is not null && ex.Context.Parser is not null && ex.Context.Reader is not null)
@@ -43,7 +43,7 @@ public class TransactionManagerException: Exception
             message += $" Specifically, at row {ex.Context.Parser.Row} and column {ex.Context.Reader.CurrentIndex + 1}." +
                        $"Text {ex.Text}.";
         }
-        return new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error",
+        return new TransactionManagerException("Transaction", Errors.WrongFlow, "CSV Parsing Error (Field)",
             message, ex);
     }
 }
